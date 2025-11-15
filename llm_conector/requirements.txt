@@ -1,2 +1,2 @@
-"fastapi[standard]">=0.121.2
+fastapi[standard]>=0.121.2
 openai>=2.8.0

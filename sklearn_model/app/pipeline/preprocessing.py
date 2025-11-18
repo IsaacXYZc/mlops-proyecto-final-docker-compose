@@ -3,7 +3,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.compose import ColumnTransformer
 
-
 def preprocess_data(path="./data/Walmart_Sales.csv"):
     '''
     Preprocesa los datos para el entrenamiento y la evaluación del modelo.

@@ -1,5 +1,5 @@
 from mlflow_utils import get_model, configure_mlflow
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
 from pipeline_runner import run_pipeline

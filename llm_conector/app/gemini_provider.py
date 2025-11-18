@@ -1,6 +1,6 @@
 import os
 from openai import OpenAI
-
+from typing import List, Union
 from dotenv import load_dotenv
 load_dotenv(override=True)
 
@@ -26,11 +26,18 @@ def get_response(prompt):
     answer = response.choices[0].message.content
     return answer
 
-def chat(prompt, chat_history):
+def chat(prompt: str, chat_history: Union[List, None]):
     messages = [{"role": "system", "content": "You are a helpful assistant for answering questions."}]
-    for user_msg, bot_msg in chat_history:
-        messages.append({"role": "user", "content": user_msg})
-        messages.append({"role": "assistant", "content": bot_msg})
+
+    if chat_history:
+        for entry in chat_history:
+            if isinstance(entry, dict) and "role" in entry and "content" in entry:
+                messages.append({"role": entry["role"], "content": entry["content"]})
+            elif isinstance(entry, (list, tuple)) and len(entry) == 2:
+                user_msg, bot_msg = entry
+                messages.append({"role": "user", "content": user_msg})
+                messages.append({"role": "assistant", "content": bot_msg})
+
     messages.append({"role": "user", "content": prompt})
 
     response = gemini.chat.completions.create(
@@ -40,6 +47,3 @@ def chat(prompt, chat_history):
     )
     answer = response.choices[0].message.content
     return answer
-
-if __name__ == "__main__":
-    print(get_response("¿Qué es la inteligencia artificial?"))

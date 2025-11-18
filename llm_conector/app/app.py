@@ -1,4 +1,4 @@
-from typing import Union
+from typing import List, Optional
 from pydantic import BaseModel
 from gemini_provider import get_response, chat
 
@@ -9,7 +9,7 @@ class Prompt(BaseModel):
 
 class chatRequest(BaseModel):
     prompt: str
-    chat_history: Union[list, None] = None
+    chat_history: Optional[List[dict]] = None 
 
 app = FastAPI(title="LLM Connector", version="1.0.0")
 
@@ -30,15 +30,12 @@ def generate_response(request: Prompt):
     
 @app.post("/chat/")
 def chat_endpoint(request: chatRequest):
-    print(request)
     try:
         prompt = request.prompt
         if not prompt:
             raise HTTPException(status_code=400, detail="Prompt is required")
 
-        chat_history = request.chat_history
-        if chat_history is None:
-            chat_history = []
+        chat_history = request.chat_history or []
 
         answer = chat(prompt, chat_history)
         return {"generated_text": answer}

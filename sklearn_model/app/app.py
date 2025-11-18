@@ -109,6 +109,7 @@ def predict(request: PredictRequest):
     Espera un JSON con los campos necesarios para la predicción.
     Devuelve la predicción como JSON.
     '''
+    
     model = get_cached_model()
     if model is None:
         raise HTTPException(status_code=400, detail="Modelo no disponible")

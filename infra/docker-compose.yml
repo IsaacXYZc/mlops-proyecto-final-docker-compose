@@ -1,0 +1,53 @@
+services:
+  mlflow:
+    build:
+      context: ./mlflow
+      dockerfile: Dockerfile
+    container_name: mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_runs:/mlruns
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"] 
+      interval: 12s
+      timeout: 5s
+      retries: 6
+    restart: unless-stopped
+
+  llm_conector:
+    build:
+      context: ../llm_conector
+      dockerfile: Dockerfile
+    container_name: llm_conector
+    ports:
+      - "8000:8000"
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    environment:
+      MLFLOW_TRACKING_URI: "http://mlflow:5000"
+      MLFLOW_EXPERIMENT_NAME: "llm_conector_experiment"
+    restart: on-failure
+
+  sklearn_model:
+    build:
+      context: ../sklearn_model
+      dockerfile: Dockerfile
+    container_name: sklearn_model
+    ports:
+      - "8100:8100"
+    volumes:
+      - mlflow_runs:/mlruns
+    environment:
+      MLFLOW_TRACKING_URI: "http://mlflow:5000"
+      MLFLOW_EXPERIMENT_NAME: "sklearn_model_experiment"
+      MODEL_NAME: "salary_model"
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    restart: on-failure
+
+volumes:
+  mlflow_runs:
+    driver: local

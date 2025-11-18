@@ -33,18 +33,25 @@ def individual_prediction(*features):
             "CPI": features[7],
             "Unemployment": features[8]
         })
+        print(response, flush=True)
         response.raise_for_status()
         prediction = response.json().get("prediction", "No prediction found")
+        print(prediction, flush=True)
         return f"Predicción: {prediction}"
     except Exception as e:
-        raise gr.Error("Error al llamar a la API del modelo sklearn: {e}")
+        raise gr.Error(f"Error al llamar a la API del modelo sklearn: {e}")
 
 def chat_with_llm(message, chat_history):
     try:
         response = requests.post(f"{llm_base_url}/chat/", json={"prompt": message, "chat_history": chat_history})
         response.raise_for_status()
         answer = response.json().get("generated_text", "Sin respuesta")
-        chat_history.append((message, answer))
+
+        chat_history = chat_history + [
+            {"role": "user", "content": message},
+            {"role": "assistant", "content": answer}
+        ]
+
         return "", chat_history
     except Exception as e:
         raise gr.Error(f"Error al llamar a la API del LLM: {e}")
@@ -74,6 +81,7 @@ with gr.Blocks(title="mlops final", theme=gr.themes.Soft()) as demo:
             submit_btn=True
         )
         msg.submit(chat_with_llm, [msg, chat],[msg, chat])
+
     with gr.Tab("Predicción con modelo sklearn"):
         with gr.Row():
             with gr.Row(scale=2):

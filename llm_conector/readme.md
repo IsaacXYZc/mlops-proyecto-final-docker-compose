@@ -5,7 +5,7 @@
 2. Activar el entorno virtual con el comando `source venv/bin/activate` (Linux/Mac) o `venv\Scripts\activate` (Windows)
 3. Instalar las dependencias con el comando `pip install -r requirements.txt`
 4. Iniciar la api con el comando `fastapi run ./app/app.py`
-6. Configurar la variable `GEMINI_API_KEY` en un archivo `.env` en la raíz del proyecto 
+6. Configurar la variable `GEMINI_API_KEY` en un archivo `.env` en la raíz del proyecto llm_conector
 
 ## Ejecutar con Docker
 1. Construir la imagen de Docker con el comando `docker build -t llm_conector .`

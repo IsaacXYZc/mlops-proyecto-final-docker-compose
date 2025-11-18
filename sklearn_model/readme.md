@@ -31,6 +31,12 @@ respuesta esperada:
 - `GET /docs`: Documentación automática de la API generada por FastAPI.
 
 - `GET /test_prediction/`: Endpoint de prueba para verificar que la predicción funciona correctamente con datos de ejemplo.
+respuesta esperada:
+```json
+{
+  "prediction": [1614353.0]
+}
+```
 
 - `GET /get_model_info/`: Retorna información sobre el modelo actualmente cargado.
 

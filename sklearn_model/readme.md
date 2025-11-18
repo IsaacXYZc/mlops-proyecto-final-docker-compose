@@ -7,6 +7,7 @@
 
 ## Endpoints disponibles
 - `POST /predict/`: Realiza una predicción utilizando el modelo entrenado. Se debe enviar un JSON con las características necesarias para la predicción.
+cuerpo de la petición en formato json:
 ```json
 {
    "Store": 1,

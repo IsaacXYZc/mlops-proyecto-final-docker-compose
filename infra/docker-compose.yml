@@ -55,15 +55,13 @@ services:
     container_name: gradio_frontend
     ports:
       - "7860:7860"
+    depends_on:
+      - llm_conector
+      - sklearn_model
     environment:
       LLM_BASE_URL: "http://llm_conector:8000"
       SKMODEL_BASE_URL: "http://sklearn_model:8100"
-      PORT: 7860
-    depends_on:
-      llm_conector:
-        condition: service_started
-      sklearn_model:
-        condition: service_started
+      PORT: "7860"
     restart: on-failure
 
 volumes:

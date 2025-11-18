@@ -26,5 +26,20 @@ def get_response(prompt):
     answer = response.choices[0].message.content
     return answer
 
+def chat(prompt, chat_history):
+    messages = [{"role": "system", "content": "You are a helpful assistant for answering questions."}]
+    for user_msg, bot_msg in chat_history:
+        messages.append({"role": "user", "content": user_msg})
+        messages.append({"role": "assistant", "content": bot_msg})
+    messages.append({"role": "user", "content": prompt})
+
+    response = gemini.chat.completions.create(
+        model=model_name,
+        messages=messages,
+        temperature=0.5,
+    )
+    answer = response.choices[0].message.content
+    return answer
+
 if __name__ == "__main__":
     print(get_response("¿Qué es la inteligencia artificial?"))

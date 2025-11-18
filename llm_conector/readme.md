@@ -12,6 +12,34 @@
 2. Ejecutar el contenedor con el comando `docker run -d -p 8000:8000 -e GEMINI_API_KEY=tu_api_key --name llm_conector llm_conector`. Recuerda reemplazar `tu_api_key` con tu clave real de API.
 
 ## Endpoints disponibles
-- `POST /generate/?prompt=your_prompt`: Genera texto basado en el prompt proporcionado.
+- `POST /generate`: Genera texto basado en el prompt proporcionado en el cuerpo de la petición.
+cuerpo de la petición en formato json:
+```json
+{
+    "prompt": "Hola"
+}
+```
+respuesta esperada:
+```json
+{
+    "generated_text": "Hola, ¿qué tal?"
+}
+```
+- `POST /chat`: Genera la siguiente respuesta basado en el mensaje y el historial de mensajes propocionado;
+```json
+{
+  "prompt": "Bien, gracias por preguntar.",
+  "chat_history": [
+    {"role": "user", "content": "Hola, mi nombre es Isaac"},
+    {"role": "assistant", "content": "Hola, ¿qué tal?"}
+  ]
+}
+```
+respuesta esperada:
+```json
+{
+    "generated_text": "¿En qué puedo ayudarte hoy, Isaac?"
+}
+```
 - `GET /docs`: Documentación automática de la API usando Swagger UI.
 - `GET /`: Retorna un mensaje de bienvenida indicando que la API está funcionando correctamente.

@@ -14,3 +14,4 @@
 ## Endpoints disponibles
 - `POST /generate/?prompt=your_prompt`: Genera texto basado en el prompt proporcionado.
 - `GET /docs`: Documentación automática de la API usando Swagger UI.
+- `GET /`: Retorna un mensaje de bienvenida indicando que la API está funcionando correctamente.

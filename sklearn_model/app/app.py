@@ -14,7 +14,6 @@ tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
 mlfow_experiment = os.getenv("MLFLOW_EXPERIMENT_NAME", "sklearn_model_experiment")
 model_name = os.getenv("MLFLOW_MODEL_NAME", "salary_model")
 
-
 class PredictRequest(BaseModel):
     Store: int
     Date: str  # formato dd-mm-YYYY
@@ -23,16 +22,7 @@ class PredictRequest(BaseModel):
     Fuel_Price: float
     CPI: float
     Unemployment: float
-
-    @field_validator("Date")
-    def parse_date(cls, v):
-        try:
-            datetime.strptime(v, "%d-%m-%Y")
-        except Exception:
-            raise ValueError("Date debe tener formato dd-mm-YYYY, ejemplo: 05-02-2010")
-        return v
     
-
 model_cache = None
 
 def get_cached_model():
@@ -54,11 +44,7 @@ def get_cached_model():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        print("Configurando MLflow...", flush=True)
-        print(f"Tracking URI: {tracking_uri}", flush=True)
-        print(f"Experimento: {mlfow_experiment}", flush=True)
         configure_mlflow(tracking_uri, mlfow_experiment)
-        print("Inicialización completa, el modelo se cargará bajo demanda.", flush=True)
     except Exception as e:
         print(f"Error al configurar MLflow: {e}", flush=True)
     yield
@@ -69,7 +55,7 @@ app = FastAPI(title="Sklearn model prediction", version="1.0.0", lifespan=lifesp
 def read_root():
     return {"Hello": "World sklearn model with FastAPI"}
 
-@app.post("/reload_model/")
+@app.get("/reload_model/")
 def reload_model():
     '''
     Fuerza la recarga del modelo desde MLflow.
@@ -82,8 +68,7 @@ def reload_model():
         model_cache = get_model()
     return {"detail": "Modelo recargado exitosamente."}
 
-
-@app.post("/test_prediction/")
+@app.get("/test_prediction/")
 def get_prediction():
     '''
     Realiza una predicción de prueba con datos fijos.
@@ -107,6 +92,15 @@ def get_prediction():
         return {"prediction": float(prediction[0])}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error indesperado en la predicción: {e}")
+    
+@app.get("/get_model_info/")
+def get_model_info():
+    '''
+    Devuelve información sobre el modelo cargado.
+    Útil para verificar qué modelo está en uso.
+    '''
+    model = get_cached_model()
+    return {"model_info": str(model)}
 
 @app.post("/predict/")
 def predict(request: PredictRequest):
@@ -124,12 +118,3 @@ def predict(request: PredictRequest):
         return {"prediction": float(prediction[0])}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error indesperado en la predicción: {e}")
-    
-@app.get("/get_model_info/")
-def get_model_info():
-    '''
-    Devuelve información sobre el modelo cargado.
-    Útil para verificar qué modelo está en uso.
-    '''
-    model = get_cached_model()
-    return {"model_info": str(model)}

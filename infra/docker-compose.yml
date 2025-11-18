@@ -48,6 +48,24 @@ services:
         condition: service_healthy
     restart: on-failure
 
+  gradio_frontend:
+    build:
+      context: ../gradio_frontend
+      dockerfile: Dockerfile
+    container_name: gradio_frontend
+    ports:
+      - "7860:7860"
+    environment:
+      LLM_BASE_URL: "http://llm_conector:8000"
+      SKMODEL_BASE_URL: "http://sklearn_model:8100"
+      PORT: 7860
+    depends_on:
+      llm_conector:
+        condition: service_started
+      sklearn_model:
+        condition: service_started
+    restart: on-failure
+
 volumes:
   mlflow_runs:
     driver: local

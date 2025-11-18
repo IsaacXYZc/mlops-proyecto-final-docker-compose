@@ -22,7 +22,6 @@ def check_status(base_url):
     except:
         return "🔴 Offline"
     
-
 def individual_prediction(*features):
     try:
         response = requests.post(f"{skmodel_base_url}/predict/", json={
@@ -56,12 +55,19 @@ with gr.Blocks(title="mlops final", theme=gr.themes.Soft()) as demo:
 
     with gr.Tab("Chat con LLM"):
         with gr.Row():
-            gr.Markdown("### LLM Connector con gemini 2.0")
+            with gr.Row(scale=2):
+                gr.Markdown("### LLM Connector con gemini 2.0")
             with gr.Row(scale=1):
-                status_llm = gr.Markdown("**Estado del LLM:** " + check_status(llm_base_url))
+                status_label = gr.Markdown("**Estado del LLM:** ")
+                status = gr.Markdown(""+check_status(llm_base_url))
                 status_button = gr.Button("Actualizar estado", size="sm")
 
-        chat = gr.Chatbot()
+                status_button.click(
+                    fn=lambda: check_status(llm_base_url),
+                    inputs=[],
+                    outputs=[status]
+                )
+        chat = gr.Chatbot(type="messages")
         msg = gr.Textbox(
             label="Mensaje",    
             placeholder="Escribe tu mensaje aqui...", 
@@ -70,10 +76,18 @@ with gr.Blocks(title="mlops final", theme=gr.themes.Soft()) as demo:
         msg.submit(chat_with_llm, [msg, chat],[msg, chat])
     with gr.Tab("Predicción con modelo sklearn"):
         with gr.Row():
-            gr.Markdown("### Predicción de ventas semanales en USD de Walmart")
+            with gr.Row(scale=2):
+                gr.Markdown("### Predicción de ventas semanales en USD de Walmart")
             with gr.Row(scale=1):
-                status_skmodel = gr.Markdown("**Estado del modelo sklearn:** " + check_status(skmodel_base_url))
-                status_button_skmodel = gr.Button("Actualizar estado", size="sm")
+                status_label = gr.Markdown("**Estado de modelo sklearn:** ")
+                status = gr.Markdown(""+check_status(skmodel_base_url))
+                status_button = gr.Button("Actualizar estado", size="sm")
+
+                status_button.click(
+                    fn=lambda: check_status(skmodel_base_url),
+                    inputs=[],
+                    outputs=[status]
+                )
         with gr.Row(scale=1):
             features = [gr.Number(label=f, scale=0, min_width=160) for f in skmodel_features]
         
@@ -100,6 +114,6 @@ with gr.Blocks(title="mlops final", theme=gr.themes.Soft()) as demo:
         Valores típicos entre 3.88 y 14.3.
         """)
         
-
 if __name__ == "__main__":
-    demo.launch(server_port=port)
+    print(f"Gradio frontend running on port {port}", flush=True)
+    demo.launch(server_name="0.0.0.0", server_port=port)

@@ -1,0 +1,86 @@
+services:
+  mlflow:
+    image: infra-mlflow:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_runs:/mlruns
+    tmpfs: /tmp
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      resources:
+        limits:
+          memory: 1G  
+        reservations:
+          memory: 512M
+
+  llm_conector:
+    image: infra-llm_conector:latest
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mlflow
+    environment:
+      MLFLOW_TRACKING_URI: "http://mlflow:5000"
+      MLFLOW_EXPERIMENT_NAME: "llm_conector_experiment"
+    tmpfs: /tmp
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      resources:
+        limits:
+          memory: 1G  
+        reservations:
+          memory: 512M
+
+  sklearn_model:
+    image: infra-sklearn_model:latest
+    ports:
+      - "8100:8100"
+    volumes:
+      - mlflow_runs:/mlruns
+    tmpfs: /tmp
+    environment:
+      MLFLOW_TRACKING_URI: "http://mlflow:5000"
+      MLFLOW_EXPERIMENT_NAME: "sklearn_model_experiment"
+      MODEL_NAME: "salary_model"
+    depends_on:
+      - mlflow
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      resources:
+        limits:
+          memory: 1G  
+        reservations:
+          memory: 512M
+
+  gradio_frontend:
+    image: infra-gradio_frontend:latest
+    ports:
+      - "7860:7860"
+    depends_on:
+      - llm_conector
+      - sklearn_model
+    tmpfs: /tmp
+    environment:
+      LLM_BASE_URL: "http://llm_conector:8000"
+      SKMODEL_BASE_URL: "http://sklearn_model:8100"
+      PORT: "7860"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      resources:
+        limits:
+          memory: 1G  
+        reservations:
+          memory: 512M
+
+volumes:
+  mlflow_runs:
+    driver: local

@@ -22,7 +22,7 @@ def check_status(base_url):
     except:
         return "🔴 Offline"
     
-def individual_prediction(*features):
+def individual_prediction_skmodel(*features):
     try:
         response = requests.post(f"{skmodel_base_url}/predict/", json={
             "Store": features[0],
@@ -103,21 +103,21 @@ with gr.Blocks(title="mlops final", theme=gr.themes.Soft()) as demo:
             output = gr.Textbox(label="Predicción", placeholder="Resultado aqui...", lines=2, interactive=False)
         
         button_predict = gr.Button("Predecir")
-        button_predict.click(individual_prediction, inputs=[*features], outputs=output)
+        button_predict.click(individual_prediction_skmodel, inputs=[*features], outputs=output)
         gr.Markdown("#### Significado de las variables")
         gr.Markdown("""
         - Store: Identificador de la tienda. 
-        Valores normales [1 - 45].
+        Valores normales entre 1 y 45 (Numeros enteros).
         - Date: Fecha de la observación.
         Valor en formato MM-DD-AAAA.
         - Holiday_Flag: Indicador de si la fecha es un feriado (1) o no (0).
         Valores posibles: 0 o 1.
         - Temperature: Temperatura en grados Fahrenheit de la región.
-        Valores típicos entre -2.06 y 100.
+        Valores típicos entre -2.06 y 100.0.
         - Fuel_Price: Precio del combustible en la región.
         Valores típicos entre 2.47 y 4.47.
         - CPI: Índice de Precios al Consumidor.
-        Valores típicos entre 126 y 227.
+        Valores típicos entre 126.0 y 227.0.
         - Unemployment: Tasa de desempleo de la región.
         Valores típicos entre 3.88 y 14.3.
         """)
